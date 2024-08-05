@@ -3,22 +3,24 @@ from flask import g
 from flask import session
 
 from flaskr.db import get_db
-
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 def test_register(client, app):
     # test that viewing the page renders without template errors
     assert client.get("/auth/register").status_code == 200
 
     # test that successful registration redirects to the login page
-    response = client.post("/auth/register", data={"username": "a", "password": "a"})
+    response = client.post("/auth/register", data={"username": "a", "password": "b"})
     assert response.headers["Location"] == "/auth/login"
 
     # test that the user was inserted into the database
     with app.app_context():
-        assert (
-            get_db().execute("SELECT * FROM user WHERE username = 'a'").fetchone()
-            is not None
-        )
+        select = get_db().execute("SELECT * FROM user WHERE username = 'a'").fetchone()
+
+        assert (select is not None)
+        #assert(select["password"] == generate_password_hash("b"))
+        assert(check_password_hash(select["password"], "b"))        
 
 
 @pytest.mark.parametrize(
