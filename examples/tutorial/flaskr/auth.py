@@ -54,6 +54,7 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
         verifypass = request.form["verifypass"]
+        gmail = request.form["gmail"]
         db = get_db()
         error = None
 
@@ -65,12 +66,16 @@ def register():
             error = "Verificación de contraseña requerida."
         elif password != verifypass:
             error = "No coincide con la contraseña."
+        elif not gmail:
+            error = "Gmail requerido."
+        
+
 
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO user (username, password, verifypass) VALUES (?, ?, ?)",
-                    (username, generate_password_hash(password), verifypass),
+                    "INSERT INTO user (username, password, verifypass, gmail) VALUES (?, ?, ?, ?)",
+                    (username, generate_password_hash(password), verifypass, gmail),
                 )
                 db.commit()
             except db.IntegrityError:
