@@ -92,15 +92,10 @@ def login():
         user = db.execute(
             "SELECT * FROM user WHERE username = ?", (username,)
         ).fetchone()
-        contr = db.execute(
-            "SELECT * FROM user WHERE username = ?", (password,)
-        ).fetchone()        
 
- 
-        if user is None :
-            error = "Usuario y contraseña incorrecta."
-        elif contr is None :
-            error= "Usuario y contraseña incorrecta."
+        if user is None or not check_password_hash(user["password"], password) :
+            error = "Usuario o contraseña incorrectas."
+
 
         if error is None:
             # store the user id in a new session and return to the index
